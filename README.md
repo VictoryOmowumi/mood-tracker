@@ -53,27 +53,3 @@ export default tseslint.config({
   },
 })
 ```
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyCkP9eeZjpVqiObKHnN_qfMLoJJm-gLerk",
-  authDomain: "moodly-69805.firebaseapp.com",
-  projectId: "moodly-69805",
-  storageBucket: "moodly-69805.firebasestorage.app",
-  messagingSenderId: "594515739289",
-  appId: "1:594515739289:web:74c4d36469dffed3da2e08",
-  measurementId: "G-MWWWW3Z0S9"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-=======
-# mood-tracker
->>>>>>> 91c666462e75521939548f249c770f95536e6e23
