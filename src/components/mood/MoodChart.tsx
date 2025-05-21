@@ -28,30 +28,30 @@ export const MoodChart = ({ entries }: MoodChartProps) => {
         <BarChart data={chartData} >
           <CartesianGrid 
             strokeDasharray="3 3" 
-            stroke={moodTheme?.text ? `${moodTheme.text}/20` : '#88888820'} 
+            stroke={moodTheme?.light.text ? `${moodTheme?.light.text}/20` : '#88888820'} 
           />
           <XAxis 
             dataKey="mood" 
             tick={{ 
-              fill: moodTheme?.text || 'currentColor',
+              fill: moodTheme?.light.text || 'currentColor',
               fontSize: 12 
             }}
           />
           <YAxis 
             tick={{ 
-              fill: moodTheme?.text || 'currentColor',
+              fill: moodTheme?.light.text || 'currentColor',
               fontSize: 12
             }}
           />
           <Tooltip 
             contentStyle={{
-              backgroundColor: moodTheme?.hex || 'hsl(var(--background))',
-              borderColor: moodTheme?.hex || 'hsl(var(--border))',
-              color: moodTheme?.text || 'hsl(var(--foreground))',
+              backgroundColor: moodTheme?.light.hex || 'hsl(var(--background))',
+              borderColor: moodTheme?.light.hex || 'hsl(var(--border))',
+              color: moodTheme?.light.text || 'hsl(var(--foreground))',
               borderRadius: 'var(--radius)'
             }}
             itemStyle={{
-              color: moodTheme?.text || 'hsl(var(--foreground))'
+              color: moodTheme?.light.text || 'hsl(var(--foreground))'
             }}
             cursor={false}
           />

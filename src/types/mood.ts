@@ -1,13 +1,14 @@
 export type MoodEntry = {
   id: string;
-  userId: string;
-  mood: Mood;
+  mood: keyof typeof moods;
+  journal: string;
   intensity: number;
-  journal?: string;
+  physicalSensations: string[];
   tags: string[];
-  sensations: string[];
-  createdAt: Date;
-  updatedAt: Date;
+  updatedAt: string;
+  youtubePlaylistId: string;
+  createdAt: string;
+  userId: string;
 };
 
 export type MoodColors = {
@@ -39,7 +40,10 @@ export const moods = {
         hex: '#d97706', // amber-600
       }
     },
-    playlistId: '37i9dQZF1DXdPec7aLTmlC'
+    playlistId: 'PLMC9KNkIncKtPzgY-5rmhvj7fax8fdxoj', // YouTube "Happy Hits"
+    fallbackTracks: [
+      { title: 'Happy - Pharrell', url: 'https://youtu.be/ZbZSe6N_BXs' }
+    ]
   },
   sad: {
     emoji: '😢',
@@ -201,8 +205,9 @@ export const moods = {
         hex: '#374151', // gray-700
       }
     },
-    playlistId: '37i9dQZF1DX4UtSsGT1Sbe'
+    playlistId: 'PLrpnnfS_2Lb55OLa7eWG7-ZFcK9Yd1g9j&si=rkr3iQVkcD4FDJvK'
   }
 } as const;
-export type Mood = keyof typeof moods;
+// https://music.youtube.com/playlist?list=PLrpnnfS_2Lb55OLa7eWG7-ZFcK9Yd1g9j&si=rkr3iQVkcD4FDJvK
+// export type Mood = keyof typeof moods;
 

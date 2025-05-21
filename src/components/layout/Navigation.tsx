@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Home, History, Calendar, Settings } from "lucide-react";
+import { Home, History, Calendar, Settings, NotebookPen } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import {
   Tooltip,
@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 const navItems = [
   { name: "Home", path: "/", icon: Home },
   { name: "History", path: "/history", icon: History },
+  { name: "Journal", path: "/journal", icon: NotebookPen },
   { name: "Calendar", path: "/calendar", icon: Calendar },
   { name: "Settings", path: "/settings", icon: Settings },
 ];
@@ -23,8 +24,8 @@ export const Navigation = () => {
     <>
       {/* Desktop Sidebar - Icons Only */}
       <aside
-        className={`hidden md:flex md:flex-col  md:w-20 md:fixed md:inset-y-0 ${
-          moodTheme?.secondary || "bg-card"
+        className={`hidden md:flex md:flex-col  md:w-24 md:fixed md:inset-y-0 ${
+          moodTheme?.light.secondary || "bg-card"
         } border-r`}
       >
         <div className="flex-1 flex flex-col  py-4">
@@ -38,15 +39,15 @@ export const Navigation = () => {
                       "flex items-center justify-center px-5 py-6 rounded-xl transition-all",
                       location.pathname === item.path
                         ? `${
-                            moodTheme?.primary || "bg-primary"
+                            moodTheme?.light.primary || "bg-primary"
                           } text-primary-foreground`
                         : `${
-                            moodTheme?.text
-                              ? `${moodTheme.text}/50`
+                            moodTheme?.light.text
+                              ? `${moodTheme?.light.text}/50`
                               : "text-muted-foreground"
                           } hover:${
-                            moodTheme?.secondary
-                              ? `${moodTheme.secondary}/80`
+                            moodTheme?.light.secondary
+                              ? `${moodTheme?.light.secondary}/80`
                               : "bg-accent"
                           }`
                     )}
@@ -63,8 +64,10 @@ export const Navigation = () => {
                 </TooltipTrigger>
                 <TooltipContent
                   side="right"
-                  className={`${moodTheme?.primary || "bg-primary"} ${
-                    moodTheme?.text ? "text-white" : "text-primary-foreground"
+                  className={`${moodTheme?.light.primary || "bg-primary"} ${
+                    moodTheme?.light.text
+                      ? "text-white"
+                      : "text-primary-foreground"
                   }`}
                 >
                   {item.name}
@@ -78,7 +81,7 @@ export const Navigation = () => {
       {/* Mobile Bottom Navigation - Compact */}
       <nav
         className={`md:hidden fixed z-50 bottom-0 w-full ${
-          moodTheme?.secondary || "bg-card"
+          moodTheme?.light.secondary || "bg-card"
         } border-t`}
       >
         <div className="flex justify-around">
@@ -91,22 +94,24 @@ export const Navigation = () => {
                     "flex flex-col items-center py-5 px-4 transition-colors ",
                     location.pathname === item.path
                       ? `border-t-5 border-t-border ${
-                          moodTheme?.primary || "text-primary "
+                          moodTheme?.light.primary || "text-primary "
                         }`
                       : `${
-                          moodTheme?.text
-                            ? `${moodTheme.text}/70`
+                          moodTheme?.light.text
+                            ? `${moodTheme?.light.text}/70`
                             : "text-muted-foreground"
                         }`
                   )}
                 >
-                  <item.icon className="h-5 w-5" />
+                  <item.icon className="h-5 w-5" strokeWidth={1} />
                 </NavLink>
               </TooltipTrigger>
               <TooltipContent
                 side="top"
-                className={`${moodTheme?.primary || "bg-primary"} ${
-                  moodTheme?.text ? "text-white" : "text-primary-foreground"
+                className={`${moodTheme?.light.primary || "bg-primary"} ${
+                  moodTheme?.light.text
+                    ? "text-white"
+                    : "text-primary-foreground"
                 }`}
               >
                 {item.name}

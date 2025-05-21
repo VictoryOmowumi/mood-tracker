@@ -1,88 +1,45 @@
+// context/ThemeContext.tsx
 import { createContext, useContext, useState, useEffect } from 'react';
 import { moods } from '@/types/mood';
-import type { Mood } from '@/types/mood';
-import { getLatestMoodEntry } from '@/services/moodService';
-import { useAuth } from '@/context/AuthContext';
 
 type ThemeContextType = {
-  currentMood: Mood | null;
-  moodTheme: typeof moods[Mood]['colors']['light'] | null;
-  setMoodTheme: (mood: Mood) => void;
-  resetTheme: () => void;
-  isLoading: boolean;
+  currentMood: keyof typeof moods | null;
+  moodTheme: typeof moods[keyof typeof moods]['colors'] | null;
+  setMoodTheme: (mood: keyof typeof moods | null, persist?: boolean) => void;
 };
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = createContext<ThemeContextType>({
+  currentMood: null,
+  moodTheme: null,
+  setMoodTheme: () => {},
+});
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [currentMood, setCurrentMood] = useState<Mood | null>(null);
-  const [moodTheme, setMoodThemeConfig] = useState<ThemeContextType['moodTheme']>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const { currentUser } = useAuth();
+  const [currentMood, setCurrentMood] = useState<keyof typeof moods | null>(null);
+  const [moodTheme, setMoodThemeState] = useState<typeof moods[keyof typeof moods]['colors'] | null>(null);
 
-  // Load saved mood from localStorage and database
+  // Initialize theme from localStorage on load
   useEffect(() => {
-    const loadTheme = async () => {
-      setIsLoading(true);
-      
-      try {
-        // 1. Check localStorage first (quickest)
-        const savedMood = localStorage.getItem('currentMood') as Mood | null;
-        if (savedMood && moods[savedMood]) {
-          setCurrentMood(savedMood);
-          setMoodThemeConfig(moods[savedMood].colors.light);
-          setIsLoading(false);
-          return;
-        }
+    const lastLoggedMood = localStorage.getItem('lastLoggedMood') as keyof typeof moods | null;
+    if (lastLoggedMood && moods[lastLoggedMood]) {
+      setCurrentMood(lastLoggedMood);
+      setMoodThemeState(moods[lastLoggedMood].colors);
+    }
+  }, []);
 
-        // 2. If no localStorage, check database for latest mood
-        if (currentUser) {
-          const latestEntry = await getLatestMoodEntry(currentUser.uid);
-          if (latestEntry?.mood) {
-            setCurrentMood(latestEntry.mood);
-            setMoodThemeConfig(moods[latestEntry.mood].colors.light);
-            localStorage.setItem('currentMood', latestEntry.mood);
-          }
-        }
-      } catch (error) {
-        console.error('Error loading theme:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadTheme();
-  }, [currentUser]);
-
-  const setMoodTheme = (mood: Mood) => {
+  const setMoodTheme = (mood: keyof typeof moods | null, persist = false) => {
     setCurrentMood(mood);
-    setMoodThemeConfig(moods[mood].colors.light);
-    localStorage.setItem('currentMood', mood);
-  };
-
-  const resetTheme = () => {
-    setCurrentMood(null);
-    setMoodThemeConfig(null);
-    localStorage.removeItem('currentMood');
+    setMoodThemeState(mood ? moods[mood].colors : null);
+    if (persist && mood) {
+      localStorage.setItem('lastLoggedMood', mood);
+    }
   };
 
   return (
-    <ThemeContext.Provider value={{ 
-      currentMood, 
-      moodTheme,
-      setMoodTheme, 
-      resetTheme,
-      isLoading
-    }}>
+    <ThemeContext.Provider value={{ currentMood, moodTheme, setMoodTheme }}>
       {children}
     </ThemeContext.Provider>
   );
 };
 
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
-};
+export const useTheme = () => useContext(ThemeContext);

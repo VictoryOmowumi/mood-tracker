@@ -4,6 +4,31 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* custom scrollbar with the theme color */
+::-webkit-scrollbar {
+  width: 5px;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #060606;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--muted);
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}
+
 @theme inline {
 
   --radius-sm: calc(var(--radius) - 4px);
@@ -264,4 +289,30 @@ body {
 
 [data-radix-tooltip-content] {
   transition: opacity 100ms ease, transform 100ms ease;
+}
+
+textarea{
+  outline: none;
+  box-shadow: none !important;
+  border: 1px solid var(--border) ;
+}
+
+/* Smooth tooltip transitions */
+[data-radix-tooltip-content] {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Heatmap cell focus states */
+.heatmap-cell:focus {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.422);
+  border-radius: 1rem;
+  box-shadow: 0 4px 32px 0 rgba(244, 244, 248, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }

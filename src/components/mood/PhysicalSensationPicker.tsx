@@ -35,7 +35,7 @@ export const PhysicalSensationPicker = ({
             whileTap={{ scale: 0.95 }}
             className={`px-3 py-1 rounded-full text-xs transition-all ${
               selected.includes(sensation)
-                ? `${moodTheme?.primary || 'bg-primary'} ${moodTheme?.text || 'text-white'}`
+                ? `${moodTheme?.light.primary || 'bg-primary'} ${moodTheme?.light.text || 'text-white'}`
                 : 'bg-background hover:bg-muted/80 text-foreground'
             }`}
           >

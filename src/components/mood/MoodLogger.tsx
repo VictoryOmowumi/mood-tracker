@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect} from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { Mood, MoodEntry } from "@/types/mood";
-import { moods } from "@/types/mood";
+import type { MoodEntry } from "@/types/mood";
+import { moods,  } from "@/types/mood";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
@@ -11,9 +11,10 @@ import { logMood, getTodayMoodEntries } from "@/services/moodService";
 import { TagsInput } from "@/components/ui/tags-input";
 import { PhysicalSensationPicker } from "./PhysicalSensationPicker";
 import { toast } from "sonner";
-import { Clock, ChevronDown, ChevronUp,Loader2 } from "lucide-react";
-import debounce from "lodash.debounce";
+import { Clock, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { useMusicPlayer } from "@/context/MusicPlayerContext";
 
+type Mood = keyof typeof moods;
 // Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -66,15 +67,16 @@ const MoodPill = ({
 
 export const MoodLogger = () => {
   const { currentUser } = useAuth();
-  const { currentMood, moodTheme, setMoodTheme } = useTheme();
+  const { currentMood, setMoodTheme } = useTheme();
   const [intensity, setIntensity] = useState(3);
   const [journal, setJournal] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [sensations, setSensations] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [entriesToday, setEntriesToday] = useState<MoodEntry[]>([]);
-  const [isQuickLog, setIsQuickLog] = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
+
+   const { openPlayer } = useMusicPlayer();
 
   // Load today's entries
   useEffect(() => {
@@ -101,14 +103,12 @@ export const MoodLogger = () => {
     if (navigator.vibrate) navigator.vibrate(50);
   };
 
-  const debouncedLogMood = useMemo(() => debounce(logMood, 1000), []);
-
   const handleSubmit = async () => {
     if (!currentMood || !currentUser) return;
 
     setIsSubmitting(true);
     try {
-      await debouncedLogMood(
+      await logMood(
         currentUser.uid,
         currentMood,
         journal,
@@ -116,20 +116,12 @@ export const MoodLogger = () => {
         tags,
         sensations
       );
-
-      toast.success(`Your ${currentMood} mood was recorded`, {
-        icon: moods[currentMood].emoji,
-        action: {
-          label: "Add Another",
-          onClick: () => setIsQuickLog(true),
-        },
-      });
-
-      // Reset form but keep mood selected
-      setJournal("");
-      setIntensity(3);
+      setMoodTheme(currentMood, true); 
+      toast.success(`Logged ${currentMood} mood!`);
+       openPlayer(moods[currentMood].playlistId);
     } catch (error) {
-      toast.error("Couldn't save your mood. Try again?");
+      toast.error("Failed to log mood");
+      console.log(error)
     } finally {
       setIsSubmitting(false);
     }
@@ -142,7 +134,7 @@ export const MoodLogger = () => {
       await logMood(currentUser.uid, mood, "", 3, [], []);
 
       toast(`Quick log: ${mood}`, {
-        icon: moods[mood].emoji,
+        icon: moods[mood as keyof typeof moods].emoji,
       });
     } catch (error) {
       toast.error("Quick save failed");
@@ -153,30 +145,23 @@ export const MoodLogger = () => {
   return (
     <div className="space-y-6">
       {/* Mood Selection Grid */}
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="grid grid-cols-2 gap-3 sm:grid-cols-4"
-      >
-        {Object.entries(moods).map(([key, mood]) => (
-          <motion.button
-            key={key}
-            variants={itemVariants}
-            onClick={() => handleMoodSelect(key as Mood)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className={`flex flex-col items-center p-4 rounded-xl transition-all ${
-              currentMood === key
-                ? `${mood.colors.light.primary} text-primary-foreground shadow-lg`
-                : "bg-white hover:bg-gray-50 dark:bg-gray-800"
-            }`}
-          >
-            <span className="text-3xl">{mood.emoji}</span>
-            <span className="mt-2 text-sm capitalize">{key}</span>
-          </motion.button>
-        ))}
-      </motion.div>
+      <div className="relative">
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-2 pb-4 no-scrollbar">
+          {Object.entries(moods).map(([key, mood]) => (
+            <motion.button
+              key={key}
+              onClick={() => handleMoodSelect(key as Mood)}
+              className={`${
+                currentMood === key ? mood.colors.light.primary : "bg-card text-accent-foreground"
+              }  flex-shrink-0 snap-center w-20 h-20 flex flex-col items-center justify-center rounded-xl`}
+             
+            >
+              <span className="text-3xl">{mood.emoji}</span>
+              <span className="text-xs mt-1 capitalize">{key}</span>
+            </motion.button>
+          ))}
+        </div>
+      </div>
 
       {/* Timeline Preview */}
       {entriesToday.length > 0 && (
@@ -210,7 +195,7 @@ export const MoodLogger = () => {
                         setIntensity(entry.intensity);
                         setJournal(entry.journal || "");
                         setTags(entry.tags);
-                        setSensations(entry.sensations);
+                        setSensations(entry.physicalSensations);
                       }}
                     />
                   ))}
@@ -281,6 +266,11 @@ export const MoodLogger = () => {
               value={journal}
               onChange={(e) => setJournal(e.target.value.slice(0, 500))}
               placeholder={`What's behind this ${currentMood} mood?`}
+              style={{ minHeight: "100px", height: "auto", resize: "none" }}
+              onInput={(e) => {
+                e.currentTarget.style.height = "auto";
+                e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+              }}
               className={`min-h-[100px] transition-all duration-300 border border-${moods[currentMood].colors.light.hex}`}
             />
           </div>
@@ -304,7 +294,7 @@ export const MoodLogger = () => {
             >
               {isSubmitting ? (
                 <motion.span
-                  animate={{ rotate: 360 }}
+                 
                   transition={{ repeat: Infinity, duration: 1 }}
                   className="flex items-center gap-2"
                 >
@@ -342,7 +332,7 @@ export const MoodLogger = () => {
                 onClick={() => handleQuickLog(key as Mood)}
                 className="p-2 rounded-lg flex flex-col items-center"
                 style={{
-                  backgroundColor: moods[key as Mood].colors.light.secondary,
+                  backgroundColor: moods[key as keyof typeof moods].colors.light.secondary,
                 }}
               >
                 <span className="text-2xl">{mood.emoji}</span>

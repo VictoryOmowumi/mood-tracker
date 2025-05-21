@@ -11,7 +11,7 @@ export const MoodSummary = () => {
     return (
       <div
         className={`text-center py-8 ${
-          moodTheme?.text || "text-muted-foreground"
+          moodTheme?.light.text || "text-muted-foreground"
         }`}
       >
         Loading mood data...
@@ -21,7 +21,7 @@ export const MoodSummary = () => {
     return (
       <div
         className={`text-center py-8 ${
-          moodTheme?.text || "text-muted-foreground"
+          moodTheme?.light.text || "text-muted-foreground"
         }`}
       >
         <div className="text-center">
@@ -82,7 +82,7 @@ const StatCard = ({
   icon: string;
   theme: any;
 }) => (
-  <div className={`rounded-lg p-4 ${theme?.secondary || "bg-muted"}`}>
+  <div className={`rounded-lg p-4 ${theme?.light.secondary || "bg-muted"}`}>
     <div className="flex items-center">
       <span
         className={`md:text-2xl mr-3 ${

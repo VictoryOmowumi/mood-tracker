@@ -28,3 +28,4 @@ export const useMoodEntries = () => {
 
   return { entries, loading, error };
 };
+
